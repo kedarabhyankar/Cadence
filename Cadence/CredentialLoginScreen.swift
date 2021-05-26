@@ -14,13 +14,18 @@ import NotificationBannerSwift
 var loginState = false
 var loginMessage = ""
 var bannerDisplayed = false
+var transferredViewToLogin = false
+var emptyFields = false
+var successfulLogin = false
+
 
 struct CredentialLoginScreen : View {
     
-    @Environment(\.colorScheme) var colorScheme : ColorScheme;
+    @Environment(\.colorScheme) var colorScheme : ColorScheme
     @State private var emailAddress: String = ""
     @State private var password: String = ""
     @State private var isEditing = false
+    @State private var loginState = false
     
     var body : some View {
         HStack {
@@ -41,9 +46,11 @@ struct CredentialLoginScreen : View {
                 self.isEditing = isEditing
             } onCommit: {
                 if(!emailAddress.isEmpty){
-                    let isEmailValid = EmailValidator.validate(email: emailAddress)
-                    if(!isEmailValid){
-                        
+                    if(!EmailValidator.validate(email: emailAddress))
+                    {
+                        let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your email address is in the wrong format!", style: .danger)
+                        banner.bannerQueue.dismissAllForced()
+                        banner.haptic = .medium
                     }
                 }
             }
@@ -66,9 +73,24 @@ struct CredentialLoginScreen : View {
                 .keyboardType(.alphabet)
             Spacer()
         }
+        
+        //        if(emailAddress.isEmpty){
+        //            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your email address cannot be empty!", style: .danger)
+        //            banner.haptic = .medium
+        //            banner.show()
+        //            emptyFields = true
+        //        } else if(password.isEmpty){
+        //            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your password cannot be empty!", style: .danger)
+        //            banner.haptic = .medium
+        //            banner.show()
+        //            emptyFields = true
+        //        } else {
+        //            emptyFields = false
+        //        }
+        
         Button(action: {
-            doAppLogin(email: emailAddress, password: password)
-        }){
+            self.loginState = doAppLogin(email: emailAddress, password: password)
+        }, label: {
             HStack {
                 Image(systemName: "arrow.right.square")
                 Text("Login")
@@ -81,8 +103,15 @@ struct CredentialLoginScreen : View {
             .background(self.colorScheme == .dark ? Color.white : Color.black)
             .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
             .cornerRadius(8)
-        }
-        Spacer().frame(height: 200)
+        })
+        
+        Spacer().frame(height: 300)
+            .background(
+                    NavigationLink(destination: Home(),
+                                   isActive: $loginState){
+                        //nothing here
+                    }
+            )
     }
 }
 
@@ -105,14 +134,13 @@ extension UIApplication: UIGestureRecognizerDelegate {
     }
 }
 
-func doAppLogin(email: String, password: String){
+func doAppLogin(email: String, password: String) -> Bool {
     let bqueue = NotificationBannerQueue.init(maxBannersOnScreenSimultaneously: 1)
     handleLogin(email: email, password: password)
-    while(loginState == false && UserDefaults.standard.bool(forKey: "asyncSignIn") == true){
-        //still in sign in flow
+    while(UserDefaults.standard.bool(forKey: "asyncSignIn") == true){
+        //still in sign in flow, this is scuffed
         print("waiting...")
     }
-    print("loginState = " + loginState.description + " loginMessage = " + loginMessage);
     if(loginState == true){
         //logged in successfully
         let banner =
@@ -120,6 +148,7 @@ func doAppLogin(email: String, password: String){
         banner.bannerQueue.dismissAllForced()
         banner.haptic = .medium
         banner.show(queue: bqueue)
+        return true
     } else {
         //didn't log in successfully, what happened?
         if(loginMessage == "NotEnabled"){
@@ -148,6 +177,7 @@ func doAppLogin(email: String, password: String){
             banner.haptic = .medium
             banner.show(queue: bqueue)
         }
+        return false
     }
 }
 
@@ -220,6 +250,10 @@ func handleLogin(email: String, password: String){
                 banner.haptic = .medium
                 banner.show(queue: bqueue)
                 bannerDisplayed = true
+                transferredViewToLogin = true
+                print("pre")
+                Home().transition(.slide).animation(.easeIn)
+                print("post")
             }
         }
     })
