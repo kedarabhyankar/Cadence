@@ -40,7 +40,8 @@ struct ContentView: View {
                         title.foregroundColor(.purple)
                         siwabutton.signInWithAppleButtonStyle(.black)
                     }
-                    NavigationLink(destination: CredentialLoginScreen()){
+                    NavigationLink(destination:
+                                    CredentialLoginScreen().onAppear(perform: UIApplication.shared.addTapGestureRecognizer)){
                             HStack {
                                 Image(systemName: "mail")
                                 Text("Sign in with Email")
