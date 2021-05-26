@@ -10,4 +10,6 @@ target 'Cadence' do
 	pod 'Firebase/Auth'
 	pod 'Firebase/Firestore'
 	pod 'EmailValidator'
+	pod 'NotificationBannerSwift', '~> 3.0.0'
+
 end
