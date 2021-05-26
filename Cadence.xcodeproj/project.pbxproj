@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3619BDC1527CBE1BFC15B4E3 /* Pods_Cadence.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C4A7A7782A7AAD57563C5C2 /* Pods_Cadence.framework */; };
 		E456A025265DDBFA00BB53AD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E456A024265DDBFA00BB53AD /* GoogleService-Info.plist */; };
+		E456A027265E083100BB53AD /* CredentialLoginScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E456A026265E083100BB53AD /* CredentialLoginScreen.swift */; };
 		E45EDC8C2659BB94004F3AD9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45EDC8B2659BB94004F3AD9 /* AppDelegate.swift */; };
 		E45EDC8E2659BB94004F3AD9 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45EDC8D2659BB94004F3AD9 /* SceneDelegate.swift */; };
 		E45EDC902659BB94004F3AD9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E45EDC8F2659BB94004F3AD9 /* ContentView.swift */; };
@@ -23,6 +24,7 @@
 		3C4A7A7782A7AAD57563C5C2 /* Pods_Cadence.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cadence.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4010F76CD3964B96D38CFCA /* Pods-Cadence.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cadence.debug.xcconfig"; path = "Target Support Files/Pods-Cadence/Pods-Cadence.debug.xcconfig"; sourceTree = "<group>"; };
 		E456A024265DDBFA00BB53AD /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		E456A026265E083100BB53AD /* CredentialLoginScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialLoginScreen.swift; sourceTree = "<group>"; };
 		E45EDC882659BB93004F3AD9 /* Cadence.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cadence.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E45EDC8B2659BB94004F3AD9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E45EDC8D2659BB94004F3AD9 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 				E45EDC992659BB96004F3AD9 /* Info.plist */,
 				E45EDC932659BB96004F3AD9 /* Preview Content */,
 				E48D66B7265DAF6D00AD8F55 /* User.swift */,
+				E456A026265E083100BB53AD /* CredentialLoginScreen.swift */,
 			);
 			path = Cadence;
 			sourceTree = "<group>";
@@ -226,6 +229,7 @@
 				E45EDC8C2659BB94004F3AD9 /* AppDelegate.swift in Sources */,
 				E45EDC8E2659BB94004F3AD9 /* SceneDelegate.swift in Sources */,
 				E45EDC902659BB94004F3AD9 /* ContentView.swift in Sources */,
+				E456A027265E083100BB53AD /* CredentialLoginScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

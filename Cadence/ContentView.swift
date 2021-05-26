@@ -12,44 +12,52 @@ import FirebaseFirestore
 struct ContentView: View {
     
     @Environment(\.colorScheme) var colorScheme : ColorScheme;
+    @State var showLoginView : Bool = false
     
     var body: some View {
-        let title = Text("Cadence")
-            .font(.custom("Avenir Next", size: 60))
-            .bold()
-            .kerning(5.0)
-            .foregroundColor(self.colorScheme == .dark ? .blue : .purple).padding()
-        VStack (spacing: 0){
-            let siwabutton = SignInWithAppleButton(.signIn, onRequest: configureSIWA, onCompletion: handleSIWA)
-                .signInWithAppleButtonStyle(self.colorScheme == .dark ? .white : .black)
-                .frame(height:45)
-                .padding()
-            
-            if(colorScheme == .dark){
-                title.foregroundColor(.blue)
-                siwabutton.signInWithAppleButtonStyle(.white)
-            } else {
-                title.foregroundColor(.purple)
-                siwabutton.signInWithAppleButtonStyle(.black)
-            }
-            
-            Button(action: navigateToSignIn, label: {
-                HStack {
-                    Image(systemName: "mail")
-                    Text("Sign in with Email")
-                        .bold()
-                        .font(.system(size: 16))
+        NavigationView {
+
+        VStack {
+            Image(systemName: "music.quarternote.3")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width:200, height:200)
+            let title = Text("Cadence")
+                .font(.custom("Avenir Next", size: 60))
+                .bold()
+                .kerning(5.0)
+                .foregroundColor(self.colorScheme == .dark ? .blue : .purple).padding()
+                VStack (spacing: 0){
+                    let siwabutton = SignInWithAppleButton(.signIn, onRequest: configureSIWA, onCompletion: handleSIWA)
+                        .signInWithAppleButtonStyle(self.colorScheme == .dark ? .white : .black)
+                        .frame(height:45)
+                        .padding()
+                    
+                    if(colorScheme == .dark){
+                        title.foregroundColor(.blue)
+                        siwabutton.signInWithAppleButtonStyle(.white)
+                    } else {
+                        title.foregroundColor(.purple)
+                        siwabutton.signInWithAppleButtonStyle(.black)
+                    }
+                    NavigationLink(destination: CredentialLoginScreen()){
+                            HStack {
+                                Image(systemName: "mail")
+                                Text("Sign in with Email")
+                                    .bold()
+                                    .font(.system(size: 17))
+                            }
+                            .frame(minWidth: 0, idealWidth: 360, maxWidth: 360, minHeight: 0, idealHeight: 45, maxHeight: 45, alignment: .center)
+                            .padding(.vertical, 0)
+                            .padding(.horizontal, 0)
+                            .background(self.colorScheme == .dark ? Color.white : Color.black)
+                            .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
+                            .cornerRadius(8)
+                        }
+                    }
                 }
-                .frame(minWidth: 0, idealWidth: 390, maxWidth: 390, minHeight: 0, idealHeight: 45, maxHeight: 45, alignment: .center)
-                .padding(.vertical, 0)
-                .padding(.horizontal, 0)
-                .background(self.colorScheme == .dark ? Color.white : Color.black)
-                .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
-                .cornerRadius(8)
-            })
-            .padding()
+            }
         }
-    }
     
     func configureSIWA(_ req: ASAuthorizationAppleIDRequest){
         req.requestedScopes = [.fullName, .email]
