@@ -19,24 +19,43 @@ struct ContentView: View {
             .bold()
             .kerning(5.0)
             .foregroundColor(self.colorScheme == .dark ? .blue : .purple).padding()
-        let button = SignInWithAppleButton(.signIn, onRequest: configure, onCompletion: handle)
-            .signInWithAppleButtonStyle(self.colorScheme == .dark ? .white : .black)
-            .frame(height:45)
+        VStack (spacing: 0){
+            let siwabutton = SignInWithAppleButton(.signIn, onRequest: configureSIWA, onCompletion: handleSIWA)
+                .signInWithAppleButtonStyle(self.colorScheme == .dark ? .white : .black)
+                .frame(height:45)
+                .padding()
+            
+            if(colorScheme == .dark){
+                title.foregroundColor(.blue)
+                siwabutton.signInWithAppleButtonStyle(.white)
+            } else {
+                title.foregroundColor(.purple)
+                siwabutton.signInWithAppleButtonStyle(.black)
+            }
+            
+            Button(action: navigateToSignIn, label: {
+                HStack {
+                    Image(systemName: "mail")
+                    Text("Sign in with Email")
+                        .bold()
+                        .font(.system(size: 16))
+                }
+                .frame(minWidth: 0, idealWidth: 390, maxWidth: 390, minHeight: 0, idealHeight: 45, maxHeight: 45, alignment: .center)
+                .padding(.vertical, 0)
+                .padding(.horizontal, 0)
+                .background(self.colorScheme == .dark ? Color.white : Color.black)
+                .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
+                .cornerRadius(8)
+            })
             .padding()
-        if(colorScheme == .dark){
-            title.foregroundColor(.blue)
-            button.signInWithAppleButtonStyle(.white)
-        } else {
-            title.foregroundColor(.purple)
-            button.signInWithAppleButtonStyle(.black)
         }
     }
     
-    func configure(_ req: ASAuthorizationAppleIDRequest){
+    func configureSIWA(_ req: ASAuthorizationAppleIDRequest){
         req.requestedScopes = [.fullName, .email]
     }
     
-    func handle(_ res: Result<ASAuthorization, Error>){
+    func handleSIWA(_ res: Result<ASAuthorization, Error>){
         let db = Firestore.firestore()
         switch res {
             case .success(let auth):
@@ -60,9 +79,13 @@ struct ContentView: View {
                     default:
                         print(auth.credential as! String + " err")
                 }
-            case .failure(let err):
-                print(err);
+            case .failure( _):
+                print("Cancelled Sign In Flow")
         }
+    }
+    
+    func navigateToSignIn(){
+        
     }
     
 }
