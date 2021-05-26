@@ -43,10 +43,8 @@ struct ContentView: View {
                 switch auth.credential {
                     case let appleIDCredentials as ASAuthorizationAppleIDCredential:
                         if let user = User(cred: appleIDCredentials){
-//                            let userData = try? JSONEncoder().encode(user);
-//                            UserDefaults.standard.setValue(userData, forKey: user.userID);
                             var ref: DocumentReference? = nil
-                            ref = db.collection("users").addDocument(data: [
+                            ref = db.collection("Users").addDocument(data: [
                                 "firstName" : user.firstName,
                                 "lastName" : user.lastName,
                                 "email" : user.email,
