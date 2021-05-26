@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import EmailValidator
+import FirebaseAuth
 
 struct CredentialLoginScreen : View {
     
@@ -63,15 +64,18 @@ struct CredentialLoginScreen : View {
         HStack {
             Spacer().frame(width: 30)
             SecureField("Password", text: $password)
-                .textFieldStyle(RoundedBorderTextFieldStyle()) {
-                    let didLogin, err = handleLogin(email: emailAddress, password: password)
-                    if(didLogin.0 == true){
-                        //logged in successfully
-                    } else {
-                        //didn't log in successfully, what happened?
-                        
-                    }
+            {
+                let loginRes = handleLogin(email: emailAddress, password: password)
+                let loginState = loginRes.state
+                let loginMessage = loginRes.message
+                if(loginState == true){
+                    //logged in successfully
+                } else {
+                    //didn't log in successfully, what happened?
+                    
                 }
+            }
+            .textFieldStyle(RoundedBorderTextFieldStyle())
             
             Spacer()
         }
@@ -117,6 +121,33 @@ extension UIApplication: UIGestureRecognizerDelegate {
     }
 }
 
-func handleLogin(email: String, password: String) -> (Bool, String) {
-    
+func handleLogin(email: String, password: String) -> (state: Bool, message: String) {
+    var state = false
+    var message = ""
+    Auth.auth().signIn(withEmail: email, password: password){ (authResult, error) in
+        if let err = error as NSError? {
+            switch AuthErrorCode(rawValue: err.code){
+                case .operationNotAllowed:
+                    state = false
+                    message = "NotEnabled"
+                case .userDisabled:
+                    state = false
+                    message = "UserDisabled"
+                case .wrongPassword:
+                    state = false
+                    message = "WrongPassword"
+                case .invalidEmail:
+                    //shouldn't happen bc of emailvalidator pod
+                    state = false
+                    message = "MalformedEmail"
+                default:
+                    state = false
+                    message = "UnknownError"
+            }
+        } else {
+            state = true
+            message = "Success"
+        }
+    }
+    return (state, message)
 }
