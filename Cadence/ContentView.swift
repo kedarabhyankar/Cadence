@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AuthenticationServices
+import FirebaseFirestore
 
 struct ContentView: View {
     
@@ -33,18 +34,30 @@ struct ContentView: View {
     
     func configure(_ req: ASAuthorizationAppleIDRequest){
         req.requestedScopes = [.fullName, .email]
-        
     }
     
     func handle(_ res: Result<ASAuthorization, Error>){
+        let db = Firestore.firestore()
         switch res {
             case .success(let auth):
                 switch auth.credential {
                     case let appleIDCredentials as ASAuthorizationAppleIDCredential:
                         if let user = User(cred: appleIDCredentials){
-                            let userData = try? JSONEncoder().encode(user);
-                            UserDefaults.standard.setValue(userData, forKey: user.userID);
-                            
+//                            let userData = try? JSONEncoder().encode(user);
+//                            UserDefaults.standard.setValue(userData, forKey: user.userID);
+                            var ref: DocumentReference? = nil
+                            ref = db.collection("users").addDocument(data: [
+                                "firstName" : user.firstName,
+                                "lastName" : user.lastName,
+                                "email" : user.email,
+                                "signInMethod" : "Sign in with Apple"
+                            ]) { err in
+                                if let err = err {
+                                    print("Error adding document \(err)")
+                                } else {
+                                    print("Document successfully added with ID: \(ref!.documentID)")
+                                }
+                            }
                         }
                     default:
                         print(auth.credential as! String + " err")
