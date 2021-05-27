@@ -10,6 +10,7 @@ import SwiftUI
 import EmailValidator
 import FirebaseAuth
 import NotificationBannerSwift
+import Combine
 
 var loginState = false
 var loginMessage = ""
@@ -37,6 +38,28 @@ extension UIApplication: UIGestureRecognizerDelegate {
     }
 }
 
+extension Notification {
+    var keyboardHeight: CGFloat {
+        return (userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height ?? 0
+    }
+}
+
+extension Publishers {
+    // 1.
+    static var keyboardHeight: AnyPublisher<CGFloat, Never> {
+        // 2.
+        let willShow = NotificationCenter.default.publisher(for: UIApplication.keyboardWillShowNotification)
+            .map { $0.keyboardHeight }
+        
+        let willHide = NotificationCenter.default.publisher(for: UIApplication.keyboardWillHideNotification)
+            .map { _ in CGFloat(0) }
+        
+        // 3.
+        return MergeMany(willShow, willHide)
+            .eraseToAnyPublisher()
+    }
+}
+
 struct CredentialLoginScreen : View {
     
     @Environment(\.colorScheme) var colorScheme : ColorScheme
@@ -44,77 +67,78 @@ struct CredentialLoginScreen : View {
     @State private var password: String = ""
     @State private var isEditing = false
     @State private var loggedIn = false
+    @State private var keyboardHeight: CGFloat = 0
     
     var body : some View {
-        //        self.foregroundColor(colorScheme == .dark ? Color.init(.darkGray) : Color.init(.lightGray))
-        HStack {
-            Text("Sign in with Email").font(.title)
-            Spacer()
-        }.padding()
-        HStack {
-            Text("Email Address").bold()
-            Spacer()
-        }.padding()
-        HStack {
-            Spacer().frame(width: 30)
-            TextField("Email Address", text: $emailAddress)
-            { isEditing in
-                self.isEditing = isEditing
-            } onCommit: {
-                if(!emailAddress.isEmpty){
-                    if(!EmailValidator.validate(email: emailAddress))
-                    {
-                        let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your email address is in the wrong format!", style: .danger)
-                        banner.bannerQueue.dismissAllForced()
-                        banner.haptic = .medium
+        VStack{
+//            Spacer().frame(height: 50)
+            HStack {
+                Text("Sign in with Email").font(.title)
+                Spacer().frame(width: 10)
+                Image(systemName: "envelope").resizable().aspectRatio(contentMode: .fill).frame(width: 20, height: 20)
+                Spacer()
+            }.padding()
+            HStack {
+                Text("Email Address").bold()
+                Spacer()
+            }.padding()
+            HStack {
+                Spacer().frame(width: 30)
+                TextField("Email Address", text: $emailAddress)
+                { isEditing in
+                    self.isEditing = isEditing
+                } onCommit: {
+                    if(!emailAddress.isEmpty){
+                        if(!EmailValidator.validate(email: emailAddress))
+                        {
+                            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your email address is in the wrong format!", style: .danger)
+                            banner.bannerQueue.dismissAllForced()
+                            banner.haptic = .medium
+                        }
                     }
                 }
-            }
-            .textFieldStyle(RoundedBorderTextFieldStyle())
-            .autocapitalization(.none)
-            .disableAutocorrection(true)
-            .keyboardType(.emailAddress)
-            Spacer()
-        }
-        HStack {
-            Text("Password").bold()
-            Spacer()
-        }.padding()
-        HStack {
-            Spacer().frame(width: 30)
-            SecureField("Password", text: $password)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
-                .keyboardType(.alphabet)
-            Spacer()
-        }
-        
-        Button(action: {
-            loggedIn = doAppLogin(email: emailAddress, password: password)
-        }, label: {
-            HStack {
-                Image(systemName: "arrow.right.square")
-                Text("Login")
-                    .bold()
-                    .font(.system(size: 17))
+                .keyboardType(.emailAddress)
+                Spacer()
             }
-            .frame(minWidth: 0, idealWidth: 360, maxWidth: 360, minHeight: 0, idealHeight: 45, maxHeight: 45, alignment: .center)
-            .padding(.vertical, 0)
-            .padding(.horizontal, 0)
-            .background(self.colorScheme == .dark ? Color.white : Color.black)
-            .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
-            .cornerRadius(8)
-        })
-        
-        Spacer().frame(height: 200)
+            HStack {
+                Text("Password").bold()
+                Spacer()
+            }.padding()
+            HStack {
+                Spacer().frame(width: 30)
+                SecureField("Password", text: $password)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                    .keyboardType(.alphabet)
+                Spacer()
+            }
+            Button(action: {
+                loggedIn = doAppLogin(email: emailAddress, password: password)
+            }, label: {
+                HStack {
+                    Image(systemName: "arrow.right.square")
+                    Text("Login")
+                        .bold()
+                        .font(.system(size: 17))
+                }
+                .frame(minWidth: 0, idealWidth: 360, maxWidth: 360, minHeight: 0, idealHeight: 45, maxHeight: 45, alignment: .center)
+                .padding(.vertical, 0)
+                .padding(.horizontal, 0)
+                .background(self.colorScheme == .dark ? Color.white : Color.black)
+                .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
+                .cornerRadius(8)
+            })
             .background(
                 NavigationLink(destination: Home(),
                                isActive: $loggedIn){
-                    //nothing here
-                    Home()
+                    EmptyView()
                 }
             )
+        }
     }
     
     func doAppLogin(email: String, password: String) -> Bool {
