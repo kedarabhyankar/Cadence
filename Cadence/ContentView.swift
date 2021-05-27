@@ -18,10 +18,11 @@ struct ContentView: View {
         NavigationView {
 
         VStack {
-            Image(systemName: "music.quarternote.3")
+            Image(systemName: "music.note")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width:200, height:200)
+                .foregroundColor(self.colorScheme == .dark ? .purple : .blue)
             let title = Text("Cadence")
                 .font(.custom("Avenir Next", size: 60))
                 .bold()
@@ -55,6 +56,16 @@ struct ContentView: View {
                             .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
                             .cornerRadius(8)
                         }
+                    Spacer().frame(height: 50)
+                    NavigationLink(destination:
+                                    CredentialSignupScreen().onAppear(perform: UIApplication.shared.addTapGestureRecognizer)){
+                        HStack {
+                            Image(systemName: "mail")
+                            Text("Sign up")
+                                .bold()
+                                .font(.system(size: 17))
+                        }
+                    }
                     }
                 }
             }
