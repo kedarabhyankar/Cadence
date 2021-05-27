@@ -73,17 +73,19 @@ struct CredentialLoginScreen : View {
         VStack{
 //            Spacer().frame(height: 50)
             HStack {
+                Spacer().frame(width: 10)
                 Text("Sign in with Email").font(.title)
                 Spacer().frame(width: 10)
                 Image(systemName: "envelope").resizable().aspectRatio(contentMode: .fill).frame(width: 20, height: 20)
                 Spacer()
-            }.padding()
+            }
             HStack {
+                Spacer().frame(width: 10)
                 Text("Email Address").bold()
                 Spacer()
-            }.padding()
+            }
             HStack {
-                Spacer().frame(width: 30)
+                Spacer().frame(width: 10)
                 TextField("Email Address", text: $emailAddress)
                 { isEditing in
                     self.isEditing = isEditing
@@ -104,11 +106,12 @@ struct CredentialLoginScreen : View {
                 Spacer()
             }
             HStack {
+                Spacer().frame(width: 10)
                 Text("Password").bold()
                 Spacer()
-            }.padding()
+            }
             HStack {
-                Spacer().frame(width: 30)
+                Spacer().frame(width: 10)
                 SecureField("Password", text: $password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .autocapitalization(.none)
