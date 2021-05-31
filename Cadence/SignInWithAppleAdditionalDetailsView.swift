@@ -11,6 +11,7 @@ import FirebaseAuth
 import FirebaseFirestore
 
 struct SignInWithAppleAdditionalDetailsView : View {
+    //TODO if going back from this screen need to delete SIWA request and allow user to resign up if necessary
     
     @Binding var userID: String
     @State var dateOfBirth = Date()
