@@ -11,8 +11,11 @@ import FirebaseFirestore
 
 struct ContentView: View {
     
-    @Environment(\.colorScheme) var colorScheme : ColorScheme;
+    @Environment(\.colorScheme) public var colorScheme : ColorScheme;
     @State var showLoginView : Bool = false
+    @State var uid = ""
+    @State var signedUpWithApple = false
+    @State var signedInWithApple = false
     
     var body: some View {
         NavigationView {
@@ -28,6 +31,16 @@ struct ContentView: View {
                 .bold()
                 .kerning(5.0)
                 .foregroundColor(self.colorScheme == .dark ? .blue : .purple).padding()
+                .background(
+                    NavigationLink(destination: SignInWithAppleAdditionalDetailsView(userID: $uid, dateOfBirth: Date()), isActive: $signedUpWithApple){
+                        EmptyView()
+                    }
+                )
+                .background(
+                    NavigationLink(destination: Home(), isActive: $signedInWithApple){
+                        EmptyView()
+                    }
+                )
                 VStack (spacing: 0){
                     let siwabutton = SignInWithAppleButton(.signIn, onRequest: configureSIWA, onCompletion: handleSIWA)
                         .signInWithAppleButtonStyle(self.colorScheme == .dark ? .white : .black)
@@ -82,8 +95,11 @@ struct ContentView: View {
                 switch auth.credential {
                     case let appleIDCredentials as ASAuthorizationAppleIDCredential:
                         if let user = User(cred: appleIDCredentials){
-                            var ref: DocumentReference? = nil
-                            ref = db.collection("Users").addDocument(data: [
+                            //signed up
+                            var _: DocumentReference? = nil
+                            uid = user.email
+                            signedUpWithApple = true
+                            db.collection("Users").document(user.email).setData([
                                 "firstName" : user.firstName,
                                 "lastName" : user.lastName,
                                 "email" : user.email,
@@ -92,9 +108,12 @@ struct ContentView: View {
                                 if let err = err {
                                     print("Error adding document \(err)")
                                 } else {
-                                    print("Document successfully added with ID: \(ref!.documentID)")
+                                    print("Document successfully added with ID: \(user.email)")
+                                    signedUpWithApple = true
                                 }
                             }
+                        } else {
+                            signedInWithApple = true
                         }
                     default:
                         print(auth.credential as! String + " err")
@@ -102,10 +121,6 @@ struct ContentView: View {
             case .failure( _):
                 print("Cancelled Sign In Flow")
         }
-    }
-    
-    func navigateToSignIn(){
-        
     }
     
 }

@@ -16,18 +16,18 @@ struct CredentialSignupScreen : View {
     
     //TODO -> Verify data in screen, push to firebase if valid and button pressed
     //Toggle from Light to Dark causes scene change
-    //Email recommendation? Why isn't it working?
-    //Password strong password recommendation
-    //Save email and password in keychain?
+    //Email recommendation? Why isn't it working? DONE
     @Environment(\.colorScheme) var colorScheme : ColorScheme;
     @State private var firstName : String = ""
     @State private var lastName : String = ""
     @State private var emailAddress: String = ""
     @State private var dateOfBirth: Date = Date()
     @State private var password: String = ""
+    @State private var confirmPassword: String = ""
     @State private var isEditing = false
     @State private var loggedIn = false
     @State private var keyboardHeight: CGFloat = 0
+    static let baseURL = URL(string: "https://kedarabhyankar.me")
     
     var body : some View {
         ScrollView{
@@ -68,12 +68,15 @@ struct CredentialSignupScreen : View {
                             let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "You can't have symbols in your first name!", style: .danger)
                             banner.haptic = .medium
                             banner.show()
+                        } else {
+                            firstName = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
                         }
                     }
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .autocapitalization(.words)
                     .disableAutocorrection(true)
                     .keyboardType(.namePhonePad)
+                    .textContentType(.givenName)
                 }
             }
             VStack {
@@ -110,6 +113,7 @@ struct CredentialSignupScreen : View {
                     .autocapitalization(.words)
                     .disableAutocorrection(true)
                     .keyboardType(.namePhonePad)
+                    .textContentType(.familyName)
                 }
             }
             //            HStack {
@@ -135,7 +139,7 @@ struct CredentialSignupScreen : View {
                 HStack {
                     Spacer().frame(width: 10)
                     DatePicker("Date of Birth", selection: $dateOfBirth, displayedComponents: [.date])
-                        .datePickerStyle(WheelDatePickerStyle())
+                        .datePickerStyle(CompactDatePickerStyle())
                         .labelsHidden()
                 }
             }
@@ -165,10 +169,12 @@ struct CredentialSignupScreen : View {
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
                     .keyboardType(.emailAddress)
+                    .textContentType(.emailAddress)
                     Spacer()
                 }
-                
-
+            }
+            
+            VStack {
                 HStack {
                     Spacer().frame(width: 10)
                     Text("Password").bold()
@@ -181,9 +187,54 @@ struct CredentialSignupScreen : View {
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .keyboardType(.alphabet)
+                        .textContentType(.newPassword)
                     Spacer()
                 }
             }
+            
+            VStack {
+                HStack {
+                    Spacer().frame(width: 10)
+                    Text("Confirm Password").bold()
+                    Spacer()
+                }
+                HStack {
+                    Spacer().frame(width:10)
+                    SecureField("Password", text: $confirmPassword)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .keyboardType(.alphabet)
+                        .textContentType(.newPassword)
+                    Spacer()
+                }
+            }
+            Button(action: {
+                loggedIn = doAppSignUp(firstName: firstName, lastName: lastName, email: emailAddress, password: password)
+            }, label: {
+                HStack {
+                    Image(systemName: "arrow.right.square")
+                    Text("Login")
+                        .bold()
+                        .font(.system(size: 17))
+                }
+                .frame(minWidth: 0, idealWidth: 360, maxWidth: 360, minHeight: 0, idealHeight: 45, maxHeight: 45, alignment: .center)
+                .padding(.vertical, 0)
+                .padding(.horizontal, 0)
+                .background(self.colorScheme == .dark ? Color.white : Color.black)
+                .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
+                .cornerRadius(8)
+            })
+            .background(
+                NavigationLink(destination: Home(),
+                               isActive: $loggedIn){
+                    EmptyView()
+                }
+            )
         }
+    }
+    
+    func doAppSignUp(firstName: String, lastName: String, email: String, password: String) -> Bool{
+        return true;
     }
 }
