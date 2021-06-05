@@ -19,70 +19,77 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-
-        VStack {
-            Image(systemName: "music.note")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width:200, height:200)
-                .foregroundColor(self.colorScheme == .dark ? .purple : .blue)
-            let title = Text("Cadence")
-                .font(.custom("Avenir Next", size: 60))
-                .bold()
-                .kerning(5.0)
-                .foregroundColor(self.colorScheme == .dark ? .blue : .purple).padding()
-                .background(
-                    NavigationLink(destination: SignInWithAppleAdditionalDetailsView(userID: $uid, dateOfBirth: Date()), isActive: $signedUpWithApple){
-                        EmptyView()
-                    }
-                )
-                .background(
-                    NavigationLink(destination: Home(), isActive: $signedInWithApple){
-                        EmptyView()
-                    }
-                )
-                VStack (spacing: 0){
+            
+            ZStack{
+                Color.init("backgroundColor").edgesIgnoringSafeArea(.all)
+            VStack {
+                Image("cadence_logo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: UIScreen.main.bounds.size.width, height: 200)
+                //            let title = Text("cadence")
+                //                .font(.custom("Nexa Bold", size: 60))
+                //                //                    .bold()
+                //                //                    .kerning(5.0)
+                //                .foregroundColor(self.colorScheme == .dark ? .blue : .purple).padding()
+                Image("cadence_text")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: UIScreen.main.bounds.size.width - 50,  height: 200)
+                    .background(
+                        NavigationLink(destination:
+                                        SignInWithAppleAdditionalDetailsView(userID: $uid, dateOfBirth: Date())
+                                        .scaleEffect(),
+                                       isActive: $signedUpWithApple){
+                            EmptyView()
+                        }
+                    )
+                    .background(
+                        NavigationLink(destination: Home(), isActive: $signedInWithApple){
+                            EmptyView()
+                        }
+                    )
+                
                     let siwabutton = SignInWithAppleButton(.signIn, onRequest: configureSIWA, onCompletion: handleSIWA)
                         .signInWithAppleButtonStyle(self.colorScheme == .dark ? .white : .black)
                         .frame(height:45)
                         .padding()
                     
                     if(colorScheme == .dark){
-                        title.foregroundColor(.blue)
                         siwabutton.signInWithAppleButtonStyle(.white)
                     } else {
-                        title.foregroundColor(.purple)
                         siwabutton.signInWithAppleButtonStyle(.black)
                     }
+                    
                     NavigationLink(destination:
                                     CredentialLoginScreen().onAppear(perform: UIApplication.shared.addTapGestureRecognizer)){
-                            HStack {
-                                Image(systemName: "mail")
-                                Text("Sign in with Email")
-                                    .bold()
-                                    .font(.system(size: 17))
-                            }
-                            .frame(minWidth: 0, idealWidth: 360, maxWidth: 360, minHeight: 0, idealHeight: 45, maxHeight: 45, alignment: .center)
-                            .padding(.vertical, 0)
-                            .padding(.horizontal, 0)
-                            .background(self.colorScheme == .dark ? Color.white : Color.black)
-                            .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
-                            .cornerRadius(8)
+                        HStack {
+                            Image(systemName: "envelope")
+                            Text("Sign in with Email")
+                                .bold()
+                                .font(.system(size: 17))
                         }
+                        .frame(minWidth: 0, idealWidth: 360, maxWidth: 360, minHeight: 0, idealHeight: 45, maxHeight: 45, alignment: .center)
+                        .padding(.vertical, 0)
+                        .padding(.horizontal, 0)
+                        .background(self.colorScheme == .dark ? Color.white : Color.black)
+                        .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
+                        .cornerRadius(8)
+                    }
                     Spacer().frame(height: 50)
                     NavigationLink(destination:
                                     CredentialSignupScreen().onAppear(perform: UIApplication.shared.addTapGestureRecognizer)){
                         HStack {
-                            Image(systemName: "mail")
-                            Text("Sign up")
+                            Image(systemName: "envelope")
+                            Text("Create a new account")
                                 .bold()
                                 .font(.system(size: 17))
                         }
                     }
-                    }
-                }
+            }
             }
         }
+    }
     
     func configureSIWA(_ req: ASAuthorizationAppleIDRequest){
         req.requestedScopes = [.fullName, .email]
@@ -122,7 +129,6 @@ struct ContentView: View {
                 print("Cancelled Sign In Flow")
         }
     }
-    
 }
 
 struct ContentView_Previews: PreviewProvider {

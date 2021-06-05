@@ -214,7 +214,7 @@ struct CredentialSignupScreen : View {
             }, label: {
                 HStack {
                     Image(systemName: "arrow.right.square")
-                    Text("Login")
+                    Text("Create Account")
                         .bold()
                         .font(.system(size: 17))
                 }
@@ -235,6 +235,50 @@ struct CredentialSignupScreen : View {
     }
     
     func doAppSignUp(firstName: String, lastName: String, email: String, password: String) -> Bool{
-        return true;
+        var endResult = false
+        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+            if let error = error as NSError? {
+                switch AuthErrorCode(rawValue: error.code) {
+                    case .operationNotAllowed:
+                        let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Email and Password support is not enabled in the app!", style: .danger)
+                        banner.bannerQueue.dismissAllForced()
+                        banner.haptic = .medium
+                        endResult = false
+                        break
+                    case .emailAlreadyInUse:
+                        let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "The given email address is already in use. Maybe you meant to sign in?", style: .danger)
+                        banner.bannerQueue.dismissAllForced()
+                        banner.haptic = .medium
+                        endResult = false
+                        break
+                    case .invalidEmail:
+                        let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your email address is in the wrong format!", style: .danger)
+                        banner.bannerQueue.dismissAllForced()
+                        banner.haptic = .medium
+                        endResult = false
+                        break
+                    case .weakPassword:
+                        let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your password is too weak!", style: .danger)
+                        banner.bannerQueue.dismissAllForced()
+                        banner.haptic = .medium
+                        endResult = false
+                        break
+                    default:
+                        let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "An unknown error occurred!", style: .danger)
+                        banner.bannerQueue.dismissAllForced()
+                        banner.haptic = .medium
+                        endResult = false
+                        break
+                }
+            } else {
+                let banner =
+                    FloatingNotificationBanner(title: "Success!", subtitle: "Signed up! Let's verify your email address now.", style: .success)
+                banner.bannerQueue.dismissAllForced()
+                banner.haptic = .medium
+                endResult = true
+            }
+        }
+        
+        return endResult
     }
 }

@@ -19,6 +19,9 @@ struct SignInWithAppleAdditionalDetailsView : View {
     @Environment(\.colorScheme) var colorScheme : ColorScheme;
     @State var dfString: String = ""
     @State var dpIdentifier = 0
+    @Environment(\.presentationMode) var presentationMode
+    @State var finishedDOBProcess = false
+    
     var dateRange: ClosedRange<Date> {
         let min = Calendar.current.date(byAdding: .year, value: -101, to: Date())!
         let max = Calendar.current.date(byAdding: .year, value: -13, to: Date())!
@@ -36,7 +39,11 @@ struct SignInWithAppleAdditionalDetailsView : View {
                     //might need to not use this based on HID requirements... not sure tho
                     Spacer()
                 }
-                Spacer().frame(width: 10)
+                Spacer()
+                    .frame(width: 10)
+                    .onAppear(perform: UIApplication.shared.addTapGestureRecognizer)
+                    .navigationBarBackButtonHidden(true)
+                    .navigationBarItems(leading: Button(""){self.presentationMode.wrappedValue.dismiss()})
                 Text("You've signed up with Apple, but we just need a few more details.")
                     .font(.system(size: 15))
                     .multilineTextAlignment(.leading)
@@ -70,6 +77,7 @@ struct SignInWithAppleAdditionalDetailsView : View {
                         print("Document successfully updated")
                     }
                 }
+                finishedDOBProcess = true
             }, label: {
                 HStack {
                     Image(systemName: "arrow.right.square")
@@ -85,7 +93,7 @@ struct SignInWithAppleAdditionalDetailsView : View {
                 .cornerRadius(8)
             })
             .background(
-                NavigationLink(destination: Home()){
+                NavigationLink(destination: Home(), isActive: $finishedDOBProcess){
                     EmptyView()
                 }
             )
