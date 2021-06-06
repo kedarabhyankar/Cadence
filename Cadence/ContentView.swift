@@ -13,7 +13,7 @@ struct ContentView: View {
     
     @Environment(\.colorScheme) public var colorScheme : ColorScheme;
     @State var showLoginView : Bool = false
-    @State var uid = ""
+    @State var userID = ""
     @State var signedUpWithApple = false
     @State var signedInWithApple = false
     
@@ -27,18 +27,13 @@ struct ContentView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: UIScreen.main.bounds.size.width, height: 200)
-                //            let title = Text("cadence")
-                //                .font(.custom("Nexa Bold", size: 60))
-                //                //                    .bold()
-                //                //                    .kerning(5.0)
-                //                .foregroundColor(self.colorScheme == .dark ? .blue : .purple).padding()
                 Image("cadence_text")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: UIScreen.main.bounds.size.width - 50,  height: 200)
                     .background(
                         NavigationLink(destination:
-                                        SignInWithAppleAdditionalDetailsView(userID: $uid, dateOfBirth: Date())
+                                        SignInWithAppleAdditionalDetailsView(userID: $userID, dateOfBirth: Date())
                                         .scaleEffect(),
                                        isActive: $signedUpWithApple){
                             EmptyView()
@@ -101,10 +96,9 @@ struct ContentView: View {
             case .success(let auth):
                 switch auth.credential {
                     case let appleIDCredentials as ASAuthorizationAppleIDCredential:
-                        if let user = User(cred: appleIDCredentials){
+                        if let user = CadenceUser(cred: appleIDCredentials){
                             //signed up
-                            var _: DocumentReference? = nil
-                            uid = user.email
+                            userID = user.email
                             signedUpWithApple = true
                             db.collection("Users").document(user.email).setData([
                                 "firstName" : user.firstName,

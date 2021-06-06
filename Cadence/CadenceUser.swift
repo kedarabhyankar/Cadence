@@ -1,14 +1,14 @@
 //
-//  User.swift
+//  CadenceUser.swift
 //  Cadence
 //
-//  Created by Kedar Abhyankar on 5/25/21.
+//  Created by Kedar Abhyankar on 6/5/21.
 //
 
 import Foundation
 import AuthenticationServices
 
-class User: Codable{
+class CadenceUser: Codable{
     let userID : String
     let firstName : String
     let lastName : String
@@ -27,6 +27,4 @@ class User: Codable{
         self.lastName = last
         self.email = email
     }
-    
-    
 }

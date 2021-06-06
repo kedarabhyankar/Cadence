@@ -1,4 +1,4 @@
-# Uncomment the next line to define a global platform for your project
+#Uncomment the next line to define a global platform for your project
  platform :ios, '13.0'
 
 target 'Cadence' do
@@ -11,5 +11,5 @@ target 'Cadence' do
 	pod 'Firebase/Firestore'
 	pod 'EmailValidator'
 	pod 'NotificationBannerSwift', '~> 3.0.0'
-	pod 'Introspect'
+	pod 'Navajo-Swift'
 end

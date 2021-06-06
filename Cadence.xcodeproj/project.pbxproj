@@ -25,7 +25,8 @@
 		E45EDC922659BB96004F3AD9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E45EDC912659BB96004F3AD9 /* Assets.xcassets */; };
 		E45EDC952659BB96004F3AD9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E45EDC942659BB96004F3AD9 /* Preview Assets.xcassets */; };
 		E45EDC982659BB96004F3AD9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E45EDC962659BB96004F3AD9 /* LaunchScreen.storyboard */; };
-		E48D66B8265DAF6D00AD8F55 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48D66B7265DAF6D00AD8F55 /* User.swift */; };
+		E4C1D3B6266C8DC600AF52C2 /* VerifyEmailAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C1D3B5266C8DC600AF52C2 /* VerifyEmailAddressView.swift */; };
+		E4C1D3B8266C91E700AF52C2 /* CadenceUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C1D3B7266C91E700AF52C2 /* CadenceUser.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,7 +88,8 @@
 		E45EDC972659BB96004F3AD9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E45EDC992659BB96004F3AD9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E45EDC9F2659C900004F3AD9 /* Cadence.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Cadence.entitlements; sourceTree = "<group>"; };
-		E48D66B7265DAF6D00AD8F55 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		E4C1D3B5266C8DC600AF52C2 /* VerifyEmailAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyEmailAddressView.swift; sourceTree = "<group>"; };
+		E4C1D3B7266C91E700AF52C2 /* CadenceUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CadenceUser.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,11 +174,12 @@
 				E45EDC962659BB96004F3AD9 /* LaunchScreen.storyboard */,
 				E45EDC992659BB96004F3AD9 /* Info.plist */,
 				E45EDC932659BB96004F3AD9 /* Preview Content */,
-				E48D66B7265DAF6D00AD8F55 /* User.swift */,
 				E456A026265E083100BB53AD /* CredentialLoginScreen.swift */,
 				E405F725265E9B9C00139B7A /* Home.swift */,
 				E405F729265F64C900139B7A /* CredentialSignupScreen.swift */,
 				E419A7BD26642AA5007683E4 /* SignInWithAppleAdditionalDetailsView.swift */,
+				E4C1D3B5266C8DC600AF52C2 /* VerifyEmailAddressView.swift */,
+				E4C1D3B7266C91E700AF52C2 /* CadenceUser.swift */,
 			);
 			path = Cadence;
 			sourceTree = "<group>";
@@ -344,11 +347,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E48D66B8265DAF6D00AD8F55 /* User.swift in Sources */,
 				E45EDC8C2659BB94004F3AD9 /* AppDelegate.swift in Sources */,
 				E45EDC8E2659BB94004F3AD9 /* SceneDelegate.swift in Sources */,
 				E45EDC902659BB94004F3AD9 /* ContentView.swift in Sources */,
+				E4C1D3B6266C8DC600AF52C2 /* VerifyEmailAddressView.swift in Sources */,
 				E405F726265E9B9C00139B7A /* Home.swift in Sources */,
+				E4C1D3B8266C91E700AF52C2 /* CadenceUser.swift in Sources */,
 				E419A7BE26642AA5007683E4 /* SignInWithAppleAdditionalDetailsView.swift in Sources */,
 				E456A027265E083100BB53AD /* CredentialLoginScreen.swift in Sources */,
 				E405F72A265F64C900139B7A /* CredentialSignupScreen.swift in Sources */,

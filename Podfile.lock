@@ -351,7 +351,6 @@ PODS:
     - gRPC-Core/Interface (= 1.28.2)
   - gRPC-Core/Interface (1.28.2)
   - GTMSessionFetcher/Core (1.5.0)
-  - Introspect (0.1.3)
   - leveldb-library (1.22.1)
   - MarqueeLabel (4.0.5)
   - nanopb (2.30908.0):
@@ -359,6 +358,7 @@ PODS:
     - nanopb/encode (= 2.30908.0)
   - nanopb/decode (2.30908.0)
   - nanopb/encode (2.30908.0)
+  - Navajo-Swift (2.1.0)
   - NotificationBannerSwift (3.0.6):
     - MarqueeLabel (~> 4.0.5)
     - SnapKit (~> 5.0.1)
@@ -370,7 +370,7 @@ DEPENDENCIES:
   - Firebase/Analytics
   - Firebase/Auth
   - Firebase/Firestore
-  - Introspect
+  - Navajo-Swift
   - NotificationBannerSwift (~> 3.0.0)
 
 SPEC REPOS:
@@ -391,10 +391,10 @@ SPEC REPOS:
     - "gRPC-C++"
     - gRPC-Core
     - GTMSessionFetcher
-    - Introspect
     - leveldb-library
     - MarqueeLabel
     - nanopb
+    - Navajo-Swift
     - NotificationBannerSwift
     - PromisesObjC
     - SnapKit
@@ -416,14 +416,14 @@ SPEC CHECKSUMS:
   "gRPC-C++": 13d8ccef97d5c3c441b7e3c529ef28ebee86fad2
   gRPC-Core: 4afa11bfbedf7cdecd04de535a9e046893404ed5
   GTMSessionFetcher: b3503b20a988c4e20cc189aa798fd18220133f52
-  Introspect: 2be020f30f084ada52bb4387fff83fa52c5c400e
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   MarqueeLabel: 00cc0bcd087111dca575878b3531af980559707d
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
+  Navajo-Swift: 57b93e73efbfbf452433efbff04402de56beff51
   NotificationBannerSwift: 7021be2338f8f29cf424b0aca43da462bf9e2a1a
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
 
-PODFILE CHECKSUM: ae24a1f38c4473a1f34c89dcae1857646a521f36
+PODFILE CHECKSUM: fe66de4a7357ca5bd61e603e0cf5f7cb58f76301
 
 COCOAPODS: 1.10.0
