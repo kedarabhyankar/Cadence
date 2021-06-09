@@ -122,7 +122,7 @@ struct CredentialLoginScreen : View {
     }
     
     func doAppLogin(email: String, password: String) -> Bool {
-        let bqueue = NotificationBannerQueue.init(maxBannersOnScreenSimultaneously: 1)
+        let bannerQueue = NotificationBannerQueue.init(maxBannersOnScreenSimultaneously: 1)
         handleLogin(email: email, password: password)
         while(UserDefaults.standard.bool(forKey: "asyncSignIn") == true){
             //still in sign in flow, this is scuffed
@@ -134,7 +134,7 @@ struct CredentialLoginScreen : View {
                 FloatingNotificationBanner(title: "Success!", subtitle: "Logged In!", style: .success)
             banner.bannerQueue.dismissAllForced()
             banner.haptic = .medium
-            banner.show(queue: bqueue)
+            banner.show(queue: bannerQueue)
             return true
         } else {
             //didn't log in successfully, what happened?
@@ -142,27 +142,27 @@ struct CredentialLoginScreen : View {
                 let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Email and Password support is not enabled in the app!", style: .danger)
                 banner.bannerQueue.dismissAllForced()
                 banner.haptic = .medium
-                banner.show(queue: bqueue)
+                banner.show(queue: bannerQueue)
             } else if(loginMessage == "UserDisabled"){
                 let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your Account has been disabled. Contact us through help!", style: .danger)
                 banner.bannerQueue.dismissAllForced()
                 banner.haptic = .medium
-                banner.show(queue: bqueue)
+                banner.show(queue: bannerQueue)
             } else if(loginMessage == "WrongPassword"){
                 let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Incorrect Password", style: .danger)
                 banner.bannerQueue.dismissAllForced()
                 banner.haptic = .medium
-                banner.show(queue: bqueue)
+                banner.show(queue: bannerQueue)
             } else if(loginMessage == "MalformedEmail"){
                 let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your email address is in the wrong format!", style: .danger)
                 banner.bannerQueue.dismissAllForced()
                 banner.haptic = .medium
-                banner.show(queue: bqueue)
+                banner.show(queue: bannerQueue)
             } else if(loginMessage == "UnknownError"){
                 let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "An unknown error occurred.", style: .danger)
                 banner.bannerQueue.dismissAllForced()
                 banner.haptic = .medium
-                banner.show(queue: bqueue)
+                banner.show(queue: bannerQueue)
             }
             return false
         }
