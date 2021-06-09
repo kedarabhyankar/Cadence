@@ -121,47 +121,42 @@ struct CredentialLoginScreen : View {
         }
     }
     
-    func displayFailureBannerWithMessage(message: String, queue : NotificationBannerQueue){
-        DispatchQueue.main.async {
+    @MainActor func displayFailureBannerWithMessage(message: String, queue : NotificationBannerQueue){
             let banner = FloatingNotificationBanner(title: "Failure!", subtitle: message, style: .danger)
             banner.bannerQueue.dismissAllForced()
             banner.haptic = .medium
             banner.show(queue: queue)
-        }
     }
     
-    func displaySuccessBannerWithMessage(message: String, queue: NotificationBannerQueue){
-        DispatchQueue.main.async {
+    @MainActor func displaySuccessBannerWithMessage(message: String, queue: NotificationBannerQueue){
             let banner = FloatingNotificationBanner(title: "Success!", subtitle: message, style: .success)
             banner.bannerQueue.dismissAllForced()
             banner.haptic = .medium
             banner.show(queue: queue)
-        }
     }
     
     func handleLogin(email: String, password: String) async {
         let bannerQueue = NotificationBannerQueue.init(maxBannersOnScreenSimultaneously: 1)
         do {
             try await Auth.auth().signIn(withEmail: email, password: password)
-            print(Auth.auth().currentUser != nil ? "USER SIGNED IN!!!" : "USER SIGN IN FAILURE!")
-            displaySuccessBannerWithMessage(message: "Logged in!", queue: bannerQueue)
+            await displaySuccessBannerWithMessage(message: "Logged in!", queue: bannerQueue)
             loggedIn = true
         } catch {
             switch AuthErrorCode(rawValue: (error as NSError).code){
                 case .operationNotAllowed:
-                    displayFailureBannerWithMessage(message: "Email and Password support is not enabled in the app!", queue: bannerQueue)
+                    await displayFailureBannerWithMessage(message: "Email and Password support is not enabled in the app!", queue: bannerQueue)
                     loggedIn = false
                 case .userDisabled:
-                    displayFailureBannerWithMessage(message: "Your Account has been disabled. Contact us through help!", queue: bannerQueue)
+                    await displayFailureBannerWithMessage(message: "Your Account has been disabled. Contact us through help!", queue: bannerQueue)
                     loggedIn = false
                 case .wrongPassword:
-                    displayFailureBannerWithMessage(message: "Incorrect Password", queue: bannerQueue)
+                    await displayFailureBannerWithMessage(message: "Incorrect Password", queue: bannerQueue)
                     loggedIn = false
                 case .invalidEmail:
-                    displayFailureBannerWithMessage(message: "Your email address is in the wrong format!", queue: bannerQueue)
+                    await displayFailureBannerWithMessage(message: "Your email address is in the wrong format!", queue: bannerQueue)
                     loggedIn = false
                 default:
-                    displayFailureBannerWithMessage(message: "An unknown error occurred.", queue: bannerQueue)
+                    await displayFailureBannerWithMessage(message: "An unknown error occurred.", queue: bannerQueue)
                     loggedIn = false
             }
         }
