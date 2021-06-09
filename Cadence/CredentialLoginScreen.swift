@@ -170,7 +170,7 @@ struct CredentialLoginScreen : View {
     
     func handleLogin(email: String, password: String){
         UserDefaults.standard.setValue(true, forKey: "asyncSignIn")
-        let bqueue = NotificationBannerQueue.init(maxBannersOnScreenSimultaneously: 1)
+        let bannerQueue = NotificationBannerQueue.init(maxBannersOnScreenSimultaneously: 1)
         Auth.auth().signIn(withEmail: email, password: password, completion: {
             (authResult, error)  in
             if let err = error as NSError? {
@@ -182,7 +182,7 @@ struct CredentialLoginScreen : View {
                             let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Email and Password support is not enabled in the app!", style: .danger)
                             banner.bannerQueue.dismissAllForced()
                             banner.haptic = .medium
-                            banner.show(queue: bqueue)
+                            banner.show(queue: bannerQueue)
                             bannerDisplayed = true
                         }
                     case .userDisabled:
@@ -192,7 +192,7 @@ struct CredentialLoginScreen : View {
                             let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your Account has been disabled. Contact us through help!", style: .danger)
                             banner.bannerQueue.dismissAllForced()
                             banner.haptic = .medium
-                            banner.show(queue: bqueue)
+                            banner.show(queue: bannerQueue)
                             bannerDisplayed = true
                         }
                     case .wrongPassword:
@@ -202,7 +202,7 @@ struct CredentialLoginScreen : View {
                             let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Incorrect Password", style: .danger)
                             banner.bannerQueue.dismissAllForced()
                             banner.haptic = .medium
-                            banner.show(queue: bqueue)
+                            banner.show(queue: bannerQueue)
                             bannerDisplayed = true
                         }
                     case .invalidEmail:
@@ -213,7 +213,7 @@ struct CredentialLoginScreen : View {
                             let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your email address is in the wrong format!", style: .danger)
                             banner.bannerQueue.dismissAllForced()
                             banner.haptic = .medium
-                            banner.show(queue: bqueue)
+                            banner.show(queue: bannerQueue)
                             bannerDisplayed = true
                         }
                     default:
@@ -223,7 +223,7 @@ struct CredentialLoginScreen : View {
                             let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "An unknown error occurred.", style: .danger)
                             banner.bannerQueue.dismissAllForced()
                             banner.haptic = .medium
-                            banner.show(queue: bqueue)
+                            banner.show(queue: bannerQueue)
                             bannerDisplayed = true
                         }
                 }
@@ -235,7 +235,7 @@ struct CredentialLoginScreen : View {
                         FloatingNotificationBanner(title: "Success!", subtitle: "Logged In!", style: .success)
                     banner.bannerQueue.dismissAllForced()
                     banner.haptic = .medium
-                    banner.show(queue: bqueue)
+                    banner.show(queue: bannerQueue)
                     bannerDisplayed = true
                     loggedIn = true
                 }
