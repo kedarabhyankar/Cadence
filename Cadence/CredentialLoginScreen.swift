@@ -32,8 +32,8 @@ extension UIApplication {
 
 extension UIApplication: UIGestureRecognizerDelegate {
     public func
-    gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                      shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                  shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true // set to `false` if you don't want to detect tap during other gestures
     }
 }
@@ -48,7 +48,7 @@ struct CredentialLoginScreen : View {
     
     var body : some View {
         VStack{
-//            Spacer().frame(height: 50)
+            //            Spacer().frame(height: 50)
             HStack {
                 Spacer().frame(width: 10)
                 Text("Sign in with Email").font(.title)
@@ -97,7 +97,7 @@ struct CredentialLoginScreen : View {
                 Spacer()
             }
             Button(action: {
-                loggedIn = doAppLogin(email: emailAddress, password: password)
+                async { await handleLogin(email: emailAddress, password: password) }
             }, label: {
                 HStack {
                     Image(systemName: "arrow.right.square")
@@ -112,135 +112,58 @@ struct CredentialLoginScreen : View {
                 .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
                 .cornerRadius(8)
             })
-            .background(
-                NavigationLink(destination: Home(),
-                               isActive: $loggedIn){
+                .background(
+                    NavigationLink(destination: Home(),
+                                   isActive: $loggedIn){
                     EmptyView()
                 }
-            )
+                )
         }
     }
     
-    func doAppLogin(email: String, password: String) -> Bool {
-        let bannerQueue = NotificationBannerQueue.init(maxBannersOnScreenSimultaneously: 1)
-        handleLogin(email: email, password: password)
-        while(UserDefaults.standard.bool(forKey: "asyncSignIn") == true){
-            //still in sign in flow, this is scuffed
-            print("waiting...")
-        }
-        if(loginState == true){
-            //logged in successfully
-            let banner =
-                FloatingNotificationBanner(title: "Success!", subtitle: "Logged In!", style: .success)
+    func displayFailureBannerWithMessage(message: String, queue : NotificationBannerQueue){
+        DispatchQueue.main.async {
+            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: message, style: .danger)
             banner.bannerQueue.dismissAllForced()
             banner.haptic = .medium
-            banner.show(queue: bannerQueue)
-            return true
-        } else {
-            //didn't log in successfully, what happened?
-            if(loginMessage == "NotEnabled"){
-                let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Email and Password support is not enabled in the app!", style: .danger)
-                banner.bannerQueue.dismissAllForced()
-                banner.haptic = .medium
-                banner.show(queue: bannerQueue)
-            } else if(loginMessage == "UserDisabled"){
-                let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your Account has been disabled. Contact us through help!", style: .danger)
-                banner.bannerQueue.dismissAllForced()
-                banner.haptic = .medium
-                banner.show(queue: bannerQueue)
-            } else if(loginMessage == "WrongPassword"){
-                let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Incorrect Password", style: .danger)
-                banner.bannerQueue.dismissAllForced()
-                banner.haptic = .medium
-                banner.show(queue: bannerQueue)
-            } else if(loginMessage == "MalformedEmail"){
-                let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your email address is in the wrong format!", style: .danger)
-                banner.bannerQueue.dismissAllForced()
-                banner.haptic = .medium
-                banner.show(queue: bannerQueue)
-            } else if(loginMessage == "UnknownError"){
-                let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "An unknown error occurred.", style: .danger)
-                banner.bannerQueue.dismissAllForced()
-                banner.haptic = .medium
-                banner.show(queue: bannerQueue)
-            }
-            return false
+            banner.show(queue: queue)
         }
     }
     
-    func handleLogin(email: String, password: String){
-        UserDefaults.standard.setValue(true, forKey: "asyncSignIn")
+    func displaySuccessBannerWithMessage(message: String, queue: NotificationBannerQueue){
+        DispatchQueue.main.async {
+            let banner = FloatingNotificationBanner(title: "Success!", subtitle: message, style: .success)
+            banner.bannerQueue.dismissAllForced()
+            banner.haptic = .medium
+            banner.show(queue: queue)
+        }
+    }
+    
+    func handleLogin(email: String, password: String) async {
         let bannerQueue = NotificationBannerQueue.init(maxBannersOnScreenSimultaneously: 1)
-        Auth.auth().signIn(withEmail: email, password: password, completion: {
-            (authResult, error)  in
-            if let err = error as NSError? {
-                switch AuthErrorCode(rawValue: err.code){
-                    case .operationNotAllowed:
-                        loginState = false
-                        loginMessage = "NotEnabled"
-                        if(!bannerDisplayed){
-                            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Email and Password support is not enabled in the app!", style: .danger)
-                            banner.bannerQueue.dismissAllForced()
-                            banner.haptic = .medium
-                            banner.show(queue: bannerQueue)
-                            bannerDisplayed = true
-                        }
-                    case .userDisabled:
-                        loginState = false
-                        loginMessage = "UserDisabled"
-                        if(!bannerDisplayed){
-                            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your Account has been disabled. Contact us through help!", style: .danger)
-                            banner.bannerQueue.dismissAllForced()
-                            banner.haptic = .medium
-                            banner.show(queue: bannerQueue)
-                            bannerDisplayed = true
-                        }
-                    case .wrongPassword:
-                        loginState = false
-                        loginMessage = "WrongPassword"
-                        if(!bannerDisplayed){
-                            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Incorrect Password", style: .danger)
-                            banner.bannerQueue.dismissAllForced()
-                            banner.haptic = .medium
-                            banner.show(queue: bannerQueue)
-                            bannerDisplayed = true
-                        }
-                    case .invalidEmail:
-                        //shouldn't happen bc of emailvalidator pod
-                        loginState = false
-                        loginMessage = "MalformedEmail"
-                        if(!bannerDisplayed){
-                            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your email address is in the wrong format!", style: .danger)
-                            banner.bannerQueue.dismissAllForced()
-                            banner.haptic = .medium
-                            banner.show(queue: bannerQueue)
-                            bannerDisplayed = true
-                        }
-                    default:
-                        loginState = false
-                        loginMessage = "UnknownError"
-                        if(!bannerDisplayed){
-                            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "An unknown error occurred.", style: .danger)
-                            banner.bannerQueue.dismissAllForced()
-                            banner.haptic = .medium
-                            banner.show(queue: bannerQueue)
-                            bannerDisplayed = true
-                        }
-                }
-            } else {
-                loginState = true
-                loginMessage = "Success"
-                if(!bannerDisplayed){
-                    let banner =
-                        FloatingNotificationBanner(title: "Success!", subtitle: "Logged In!", style: .success)
-                    banner.bannerQueue.dismissAllForced()
-                    banner.haptic = .medium
-                    banner.show(queue: bannerQueue)
-                    bannerDisplayed = true
-                    loggedIn = true
-                }
+        do {
+            try await Auth.auth().signIn(withEmail: email, password: password)
+            print(Auth.auth().currentUser != nil ? "USER SIGNED IN!!!" : "USER SIGN IN FAILURE!")
+            displaySuccessBannerWithMessage(message: "Logged in!", queue: bannerQueue)
+            loggedIn = true
+        } catch {
+            switch AuthErrorCode(rawValue: (error as NSError).code){
+                case .operationNotAllowed:
+                    displayFailureBannerWithMessage(message: "Email and Password support is not enabled in the app!", queue: bannerQueue)
+                    loggedIn = false
+                case .userDisabled:
+                    displayFailureBannerWithMessage(message: "Your Account has been disabled. Contact us through help!", queue: bannerQueue)
+                    loggedIn = false
+                case .wrongPassword:
+                    displayFailureBannerWithMessage(message: "Incorrect Password", queue: bannerQueue)
+                    loggedIn = false
+                case .invalidEmail:
+                    displayFailureBannerWithMessage(message: "Your email address is in the wrong format!", queue: bannerQueue)
+                    loggedIn = false
+                default:
+                    displayFailureBannerWithMessage(message: "An unknown error occurred.", queue: bannerQueue)
+                    loggedIn = false
             }
-        })
-        UserDefaults.standard.setValue(false, forKey: "asyncSignIn")
+        }
     }
 }
