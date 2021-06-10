@@ -28,6 +28,7 @@ struct CredentialSignupScreen : View {
     @State private var isEditing = false
     @State private var loggedIn = false
     @State var dpIdentifier = 1
+    let bannerQueue = NotificationBannerQueue(maxBannersOnScreenSimultaneously: 1)
     var dateRange: ClosedRange<Date> {
         let min = Calendar.current.date(byAdding: .year, value: -101, to: Date())!
         let max = Calendar.current.date(byAdding: .year, value: -13, to: Date())!
@@ -203,17 +204,9 @@ struct CredentialSignupScreen : View {
                 }
             }
             Button(action: {
-                loggedIn = doAppSignUp(firstName: firstName, lastName: lastName, email: emailAddress, password: password)
-                if(!isPasswordStrongEnough(password: $password.wrappedValue)){
-                    loggedIn = false
-                }
-                if(!$password.wrappedValue.isEmpty && !$confirmPassword.wrappedValue.isEmpty && !doPasswordsMatch(password: $password.wrappedValue, confPassword: $confirmPassword.wrappedValue)){
-                    let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your passwords don't match!", style : .danger)
-                    banner.bannerQueue.dismissAllForced()
-                    banner.haptic = .medium
-                    banner.show()
-                    loggedIn = false
-                }
+                async { await doAppSignUp(firstName: firstName, lastName: lastName, email: emailAddress, password: password)}
+                isPasswordStrongEnough(password: $password.wrappedValue)
+                doPasswordsMatch(password: $password.wrappedValue, confPassword: $confirmPassword.wrappedValue)
             }, label: {
                 HStack {
                     Image(systemName: "arrow.right.square")
@@ -228,95 +221,63 @@ struct CredentialSignupScreen : View {
                 .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
                 .cornerRadius(8)
             })
-            .background(
-                NavigationLink(destination: VerifyEmailAddressView(firstName: $firstName, lastName: $lastName, emailAddress: $emailAddress), isActive: $loggedIn){
+                .background(
+                    NavigationLink(destination: VerifyEmailAddressView(firstName: $firstName, lastName: $lastName, emailAddress: $emailAddress), isActive: $loggedIn){
                     EmptyView()
-                }
-            )
+                })
         }
     }
     
-    func doAppSignUp(firstName: String, lastName: String, email: String, password: String) -> Bool{
-        var endResult = false
-        var set = 0
-        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-            if let error = error as NSError? {
-                switch AuthErrorCode(rawValue: error.code) {
-                    case .operationNotAllowed:
-                        if(set == 0){
-                            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Email and Password support is not enabled in the app!", style: .danger)
-                            banner.bannerQueue.dismissAllForced()
-                            banner.haptic = .medium
-                            banner.show()
-                            endResult = false
-                            set = 1
-                            break
-                        }
-                    case .emailAlreadyInUse:
-                        if(set == 0){
-                            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "The given email address is already in use. Maybe you meant to sign in?", style: .danger)
-                            banner.bannerQueue.dismissAllForced()
-                            banner.haptic = .medium
-                            endResult = false
-                            banner.show()
-                            set = 1
-                            break
-                        }
-                    case .invalidEmail:
-                        if(set == 0){
-                            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your email address is in the wrong format!", style: .danger)
-                            banner.bannerQueue.dismissAllForced()
-                            banner.haptic = .medium
-                            banner.show()
-                            endResult = false
-                            set = 1
-                            break
-                        }
-                    case .weakPassword:
-                        if(set == 0){
-                            //don't show since rule validation done separately
-                            endResult = false
-                            set = 1
-                            break
-                        }
-                    default:
-                        if(set == 0){
-                            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "An unknown error occurred!", style: .danger)
-                            banner.bannerQueue.dismissAllForced()
-                            banner.haptic = .medium
-                            banner.show()
-                            endResult = false
-                            set = 1
-                            break
-                        }
-                }
-            } else {
-                if(set == 0){
-                    let banner =
-                        FloatingNotificationBanner(title: "Success!", subtitle: "Signed up! Let's verify your email address now.", style: .success)
-                    banner.bannerQueue.dismissAllForced()
-                    banner.haptic = .medium
-                    banner.show()
-                    endResult = true
-                }
+    @MainActor func displayFailureBannerWithMessage(message: String, queue : NotificationBannerQueue){
+        let banner = FloatingNotificationBanner(title: "Failure!", subtitle: message, style: .danger)
+        banner.bannerQueue.dismissAllForced()
+        banner.haptic = .medium
+        banner.show(queue: queue)
+    }
+    
+    @MainActor func displaySuccessBannerWithMessage(message: String, queue: NotificationBannerQueue){
+        let banner = FloatingNotificationBanner(title: "Success!", subtitle: message, style: .success)
+        banner.bannerQueue.dismissAllForced()
+        banner.haptic = .medium
+        banner.show(queue: queue)
+    }
+    
+    func doAppSignUp(firstName: String, lastName: String, email: String, password: String) async {
+        do {
+            try await Auth.auth().createUser(withEmail: email, password: password)
+            await displaySuccessBannerWithMessage(message: "Signed Up!", queue: bannerQueue)
+            loggedIn = true
+        } catch {
+            switch AuthErrorCode(rawValue: (error as NSError).code) {
+                case .operationNotAllowed:
+                    await displayFailureBannerWithMessage(message: "Email and Password support is not enabled in the app!", queue: bannerQueue)
+                    loggedIn = false
+                case .emailAlreadyInUse:
+                    await displayFailureBannerWithMessage(message: "The given email address is already in use. Maybe you meant to sign in?", queue: bannerQueue)
+                    loggedIn = false
+                case .invalidEmail:
+                    await displayFailureBannerWithMessage(message: "Your email address is in the wrong format!", queue: bannerQueue)
+                    loggedIn = false
+                case .weakPassword:
+                    //don't show since rule validation done separately
+                    loggedIn = false
+                default:
+                    await displayFailureBannerWithMessage(message: "An unknown error occurred!", queue: bannerQueue)
+                    loggedIn = false
             }
+            
         }
-        
-        return endResult
     }
     
-    func doPasswordsMatch(password: String, confPassword: String) -> Bool {
-        return password == confPassword
+    @MainActor func doPasswordsMatch(password: String, confPassword: String) {
+        loggedIn = !password.isEmpty && !confPassword.isEmpty && password == confPassword
     }
     
-    func isPasswordStrongEnough(password: String) -> Bool {
+    @MainActor func isPasswordStrongEnough(password: String) {
         if(password.count == 0){
             //empty password
-            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your password can't be empty!")
-            banner.bannerQueue.dismissAllForced()
-            banner.haptic = .medium
-            banner.show()
-            return false
+            displayFailureBannerWithMessage(message: "Your password can't be empty!", queue: bannerQueue)
+            loggedIn = false
         }
         let minLength = 6
         let maxLength = 20
@@ -333,50 +294,32 @@ struct CredentialSignupScreen : View {
             let firstResult = resMap.first
             if(firstResult == "Must be within range \(minLength) - \(maxLength)"){
                 //password length not valid
-                let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your password must have between 6 and 20 characters!", style: .danger)
-                banner.bannerQueue.dismissAllForced()
-                banner.haptic = .medium
-                banner.show()
-                return false
+                displayFailureBannerWithMessage(message: "Your password must have between 6 and 20 characters!", queue: bannerQueue)
+                loggedIn = false
             } else if(firstResult == "Must include uppercase characters"){
                 //password doesn't have uppercase characters
-                let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your password must have at least one uppercase character!", style: .danger)
-                banner.bannerQueue.dismissAllForced()
-                banner.haptic = .medium
-                banner.show()
-                return false
+                displayFailureBannerWithMessage(message: "Your password must have at least one uppercase character!", queue: bannerQueue)
+                loggedIn = false
             } else if(firstResult == "Must include lowercase characters"){
                 //password doesn't have lowercase characters
-                let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your password must have at least one lowercase character!", style: .danger)
-                banner.bannerQueue.dismissAllForced()
-                banner.haptic = .medium
-                banner.show()
-                return false
+                displayFailureBannerWithMessage(message: "Your password must have at least one lowercase character!", queue: bannerQueue)
+                loggedIn = false
             } else if(firstResult == "Must include symbol characters"){
                 //password doesn't have symbols
-                let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your password must have at least one symbol!", style: .danger)
-                banner.bannerQueue.dismissAllForced()
-                banner.haptic = .medium
-                banner.show()
-                return false
+                displayFailureBannerWithMessage(message: "Your password must have at least one symbol!", queue: bannerQueue)
+                loggedIn = false
             } else if(firstResult == "Must include decimal digit characters"){
                 //password doesn't have numbers
-                let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Your password must have at least one number!", style: .danger)
-                banner.bannerQueue.dismissAllForced()
-                banner.haptic = .medium
-                banner.show()
-                return false
+                displayFailureBannerWithMessage(message: "Your password must have at least one number!", queue: bannerQueue)
+                loggedIn = false
             } else {
                 print("PASS ERR: \(firstResult!)") //map always has at least one element bc of if let
-                let banner = FloatingNotificationBanner(title: "Failure!", subtitle: "Unknown Password Error!", style: .danger)
-                banner.bannerQueue.dismissAllForced()
-                banner.haptic = .medium
-                banner.show()
-                return false
+                displayFailureBannerWithMessage(message: "Unknown Password Error!", queue: bannerQueue)
+                loggedIn = false
             }
         } else {
             print("PASSWORD SUCESS")
-            return true
+            loggedIn = true
         }
     }
 }
