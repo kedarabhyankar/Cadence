@@ -29,28 +29,22 @@ struct SignInWithAppleAdditionalDetailsView : View {
     }
     
     var body : some View {
-        ScrollView{
+//        ScrollView{
             VStack {
                 HStack {
                     Spacer().frame(width: 10)
-                    Text("Finish Setting up your Account").font(.title)
+                    Text("Finish Setting up your Account").font(.title2)
                     Spacer().frame(width: 10)
                     Image(systemName: "person.crop.circle").resizable().aspectRatio(contentMode: .fill).frame(width: 20, height: 20)
                     //might need to not use this based on HID requirements... not sure tho
                     Spacer()
                 }
-                Spacer()
-                    .frame(width: 10)
-                    .onAppear(perform: UIApplication.shared.addTapGestureRecognizer)
-                    .navigationBarBackButtonHidden(true)
-                    .navigationBarItems(leading: Button(""){self.presentationMode.wrappedValue.dismiss()})
                 Text("You've chosen to Sign in with Apple, but we just need a few more details.")
                     .font(.system(size: 15))
                     .multilineTextAlignment(.leading)
                     .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding()
-                Spacer()
                 HStack {
                     Spacer().frame(width: 10)
                     Text("Date of Birth").font(.title2)
@@ -61,9 +55,8 @@ struct SignInWithAppleAdditionalDetailsView : View {
                     .labelsHidden()
                     .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
                     .id(dpIdentifier)
-                Spacer()
             }
-            Spacer()
+
             Button(action: {
                 let db = Firestore.firestore()
                 let docRef = db.collection("Users").document(userID)
@@ -97,6 +90,9 @@ struct SignInWithAppleAdditionalDetailsView : View {
                     EmptyView()
                 }
             )
+            .onAppear(perform: UIApplication.shared.addTapGestureRecognizer)
+            .navigationBarBackButtonHidden(true)
+            .navigationBarItems(leading: Button(""){self.presentationMode.wrappedValue.dismiss()})
         }
-    }
+//    }
 }
