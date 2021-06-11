@@ -113,26 +113,24 @@ struct CredentialLoginScreen : View {
                 .cornerRadius(8)
             })
                 .background(
-                    NavigationLink(destination: Home(),
-                                   isActive: $loggedIn){
+                    NavigationLink(destination: Home(), isActive: $loggedIn){
                     EmptyView()
-                }
-                )
+                })
         }
     }
     
     @MainActor func displayFailureBannerWithMessage(message: String, queue : NotificationBannerQueue){
-            let banner = FloatingNotificationBanner(title: "Failure!", subtitle: message, style: .danger)
-            banner.bannerQueue.dismissAllForced()
-            banner.haptic = .medium
-            banner.show(queue: queue)
+        let banner = FloatingNotificationBanner(title: "Failure!", subtitle: message, style: .danger)
+        banner.bannerQueue.dismissAllForced()
+        banner.haptic = .medium
+        banner.show(queue: queue)
     }
     
     @MainActor func displaySuccessBannerWithMessage(message: String, queue: NotificationBannerQueue){
-            let banner = FloatingNotificationBanner(title: "Success!", subtitle: message, style: .success)
-            banner.bannerQueue.dismissAllForced()
-            banner.haptic = .medium
-            banner.show(queue: queue)
+        let banner = FloatingNotificationBanner(title: "Success!", subtitle: message, style: .success)
+        banner.bannerQueue.dismissAllForced()
+        banner.haptic = .medium
+        banner.show(queue: queue)
     }
     
     func handleLogin(email: String, password: String) async {

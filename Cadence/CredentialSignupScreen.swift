@@ -184,9 +184,7 @@ struct CredentialSignupScreen : View {
                         .textContentType(.newPassword)
                     Spacer()
                 }
-            }
-            
-            VStack {
+                
                 HStack {
                     Spacer().frame(width: 10)
                     Text("Confirm Password").bold()
@@ -265,7 +263,6 @@ struct CredentialSignupScreen : View {
                     await displayFailureBannerWithMessage(message: "An unknown error occurred!", queue: bannerQueue)
                     loggedIn = false
             }
-            
         }
     }
     
@@ -318,7 +315,7 @@ struct CredentialSignupScreen : View {
                 loggedIn = false
             }
         } else {
-            print("PASSWORD SUCESS")
+            //            print("PASSWORD SUCESS")
             loggedIn = true
         }
     }

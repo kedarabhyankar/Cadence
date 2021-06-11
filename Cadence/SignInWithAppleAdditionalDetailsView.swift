@@ -33,9 +33,9 @@ struct SignInWithAppleAdditionalDetailsView : View {
             VStack {
                 HStack {
                     Spacer().frame(width: 10)
-                    Text("Sign up with Apple").font(.title)
+                    Text("Finish Setting up your Account").font(.title)
                     Spacer().frame(width: 10)
-                    Image(systemName: "applelogo").resizable().aspectRatio(contentMode: .fill).frame(width: 20, height: 20)
+                    Image(systemName: "person.crop.circle").resizable().aspectRatio(contentMode: .fill).frame(width: 20, height: 20)
                     //might need to not use this based on HID requirements... not sure tho
                     Spacer()
                 }
@@ -44,7 +44,7 @@ struct SignInWithAppleAdditionalDetailsView : View {
                     .onAppear(perform: UIApplication.shared.addTapGestureRecognizer)
                     .navigationBarBackButtonHidden(true)
                     .navigationBarItems(leading: Button(""){self.presentationMode.wrappedValue.dismiss()})
-                Text("You've signed up with Apple, but we just need a few more details.")
+                Text("You've chosen to Sign in with Apple, but we just need a few more details.")
                     .font(.system(size: 15))
                     .multilineTextAlignment(.leading)
                     .lineLimit(nil)
