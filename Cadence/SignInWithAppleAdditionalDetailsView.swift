@@ -60,9 +60,10 @@ struct SignInWithAppleAdditionalDetailsView : View {
             Button(action: {
                 let db = Firestore.firestore()
                 let docRef = db.collection("Users").document(userID)
-                print("DOB \(dateOfBirth)")
+                let dob = dateOfBirth.formatted(date: .numeric, time: .omitted)
+                print("DOB \(dob)")
                 docRef.updateData([
-                    "dateOfBirth" : dateOfBirth
+                    "dateOfBirth" : dob
                 ]) { err in
                     if let err = err {
                         print("Error updating document \(err)")
